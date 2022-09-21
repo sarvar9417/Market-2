@@ -62,9 +62,9 @@ const savedOrdersSlice = createSlice({
         [getSavedOrders.pending]: (state) => {
             state.getLoading = true
         },
-        [getSavedOrders.fulfilled]: (state, {payload}) => {
+        [getSavedOrders.fulfilled]: (state, {payload : {temporaryOrders}}) => {
             state.getLoading = false
-            state.savedOrders = payload
+            state.savedOrders = temporaryOrders
         },
         [getSavedOrders.rejected]: (state, {payload}) => {
             universalToast(payload.message, 'error')
