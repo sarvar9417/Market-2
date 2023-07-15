@@ -62,19 +62,22 @@ module.exports.getAll = async (req, res) => {
             code: prod.product.code,
             category: filialCategory._id
           })
-          const product = await Product.findOne({
-            market: prod.filial,
-            productdata: filialProductData._id
-          })
-          prod.filialProductsTotal = product.total;
+          if (filialProductData) {
+            const product = await Product.findOne({
+              market: prod.filial,
+              productdata: filialProductData._id
+            })
+            prod.filialProductsTotal = product.total;
+          }
         }
         const product = await Product.findById(prod.product._id)
-        prod.total = product.total;
+        prod.total = product ? product.total : 0;
       }
     }
 
     res.status(201).send(temporaries);
   } catch (error) {
+    console.log(error);
     res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
