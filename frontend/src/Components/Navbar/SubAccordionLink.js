@@ -1,6 +1,6 @@
 import {useEffect} from 'react'
 import {IoChevronForward} from 'react-icons/io5'
-import {GoPrimitiveDot} from 'react-icons/go'
+// import {GoPrimitiveDot} from 'react-icons/go'
 import {NavLink} from 'react-router-dom'
 import { useTranslation } from 'react-i18next';
 import {map} from 'lodash'
@@ -59,9 +59,9 @@ function SubAccordionLink({
                         to={subitem.path}
                         className={navLinkClasses}
                     >
-                        <span>
+                        {/* <span>
                             <GoPrimitiveDot opacity={0.5} size={'0.8rem'} />
-                        </span>
+                        </span> */}
                         <span>{t(subitem.label)}</span>
                     </NavLink>
                 ))}

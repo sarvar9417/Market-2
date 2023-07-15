@@ -4,7 +4,7 @@ import {NavLink, useLocation} from 'react-router-dom'
 import SubAccordionLink from './SubAccordionLink'
 import {useTranslation} from 'react-i18next'
 import {map} from 'lodash'
-import {GoPrimitiveDot} from 'react-icons/go'
+// import {GoPrimitiveDot} from 'react-icons/go'
 
 function AccordionLink({
                            label,
@@ -89,7 +89,7 @@ function AccordionLink({
                                 }}
                             >
                                 <span className={'circle-icon'}>
-                                     <GoPrimitiveDot size={'0.8rem'} />
+                                     {/* <GoPrimitiveDot size={'0.8rem'} /> */}
                                  </span>
                                 <span
                                     className={'text-base leading-[1.1875rem]'}
