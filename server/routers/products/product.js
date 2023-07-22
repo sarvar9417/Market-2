@@ -355,6 +355,122 @@ module.exports.register = async (req, res) => {
       },
     });
 
+
+    if (!marke.mainmarket) {
+      for (const filialId of marke.filials) {
+        const filialCategory = await Category.findOne({
+          market: filialId,
+          code: categor.code
+        })
+
+        const filialproduct = await ProductData.findOne({
+          market: filialId,
+          category: filialCategory._id,
+          code, 
+        });
+
+        const filialproductBarcode = await ProductData.findOne({
+          barcode,
+          market: filialId,
+        });
+
+        if (filialproduct) {
+          return res.status(400).json({
+            message: `Diqqat! ${code} kodli mahsulot avval yaratilgan.`,
+          });
+        }
+
+        if (filialproductBarcode) {
+          return res.status(400).json({
+            message: `Diqqat! ${barcode} shtrixkodli mahsulot avval yaratilgan.`,
+          });
+        }
+
+        if (!filialCategory) {
+          return res.status(400).json({
+            message: `Diqqat! Kategoriya ma'lumotlari topilmadi.`,
+          });
+        }
+
+        const isfilialunitt = await Unit.findOne({
+          market: filialId,
+          name: unitt.name
+        })
+
+        let filialunitt = null;
+
+        if (!isfilialunitt) {
+          // return res.status(400).json({
+          //   message: `Diqqat! Ko'rsatilgan o'lchov birligi omborda mavjud emas.`,
+          // });
+          filialunitt = new Unit({
+            name: unitt.name,
+            market: filialId
+          })
+          await filialunitt.save()
+        } else {
+           filialunitt = isfilialunitt
+        }
+        console.log(filialunitt);
+
+        const newFilialProductData = new ProductData({
+          code,
+          name,
+          category: filialCategory._id,
+          unit: filialunitt._id,
+          market: filialId,
+          barcode,
+        });
+        await newFilialProductData.save();
+
+        const newFilialProduct = new Product({
+          productdata: newFilialProductData._id,
+          category: filialCategory._id,
+          market: filialId,
+          unit: filialunitt,
+          minimumcount,
+          total: 0,
+        });
+
+        const newFilialPrice = new ProductPrice({
+          incomingprice: incomingprice
+            ? Math.round(incomingprice * 1000) / 1000
+            : 0,
+          sellingprice: sellingprice ? Math.round(sellingprice * 1000) / 1000 : 0,
+          incomingpriceuzs: incomingpriceuzs
+            ? Math.round(incomingpriceuzs * 1) / 1
+            : 0,
+          sellingpriceuzs: sellingpriceuzs
+            ? Math.round(sellingpriceuzs * 1) / 1
+            : 0,
+          tradeprice: tradeprice ? Math.round(tradeprice * 1000) / 1000 : 0,
+          tradepriceuzs: tradepriceuzs ? Math.round(tradepriceuzs * 1) / 1 : 0,
+          market: filialId,
+        });
+
+        await newFilialPrice.save();
+
+        newFilialProduct.price = newFilialPrice._id;
+        await newFilialProduct.save();
+        newFilialPrice.product = newFilialProduct._id;
+        await newFilialPrice.save();
+
+        await ProductData.findByIdAndUpdate(newFilialProductData._id, {
+          $push: {
+            products: newFilialProduct._id,
+          },
+          product: newFilialProduct._id,
+        });
+
+        await Category.findByIdAndUpdate(filialCategory, {
+          $push: {
+            products: newFilialProductData._id,
+          },
+        });
+      }
+    }
+
+
     const productcode = new RegExp(
       ".*" + search ? search.code : "" + ".*",
       "i"
@@ -403,6 +519,7 @@ module.exports.register = async (req, res) => {
       count,
     });
   } catch (error) {
+    console.log(error);
     res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
@@ -432,7 +549,7 @@ module.exports.update = async (req, res) => {
 
     const { currentPage, countPage, search } = req.body;
     const marke = await Market.findById(market);
-
+    console.log(marke);
     if (!marke) {
       return res.status(400).json({
         message: "Diqqat! Do'kon ma'lumotlari topilmadi.",
@@ -510,6 +627,8 @@ module.exports.update = async (req, res) => {
 
     const productData = await ProductData.findById(productdata);
 
+    let oldCode = productData.code
+
     productData.name = name;
     productData.code = code;
     productData.barcode = barcode;
@@ -531,6 +650,102 @@ module.exports.update = async (req, res) => {
     product.minimumcount = minimumcount;
     await product.save();
     await productData.save();
+
+    const categoryData = await Category.findById(category)
+    const unitt = await Unit.findById(unit)
+
+    if (!marke.mainmarket) {
+      for (const filialId of marke.filials) {
+
+        const filialCategory = await Category.findOne({
+          market: filialId,
+          code: categoryData.code
+        })
+
+        const filialproductData = await ProductData.findOne({
+          market: filialId,
+          code: oldCode,
+          category: filialCategory
+        });
+
+        const filialproduct = await Product.findOne({
+          productdata: filialproductData._id,
+          market: filialId
+        })
+          .populate({
+            path: "productdata",
+            select: "code barcode",
+          })
+          .populate({
+            path: "category",
+            select: "code",
+          });
+
+        await ProductPrice.findByIdAndUpdate(filialproduct.price, {
+          incomingprice: Math.round(incomingprice * 1000) / 1000,
+          sellingprice: Math.round(sellingprice * 1000) / 1000,
+          incomingpriceuzs:
+            Math.round(
+              (incomingpriceuzs
+                ? incomingpriceuzs
+                : exchangerate.exchangerate * incomingprice) * 1
+            ) / 1,
+          sellingpriceuzs:
+            Math.round(
+              (sellingpriceuzs
+                ? sellingpriceuzs
+                : exchangerate.exchangerate * sellingprice) * 1
+            ) / 1,
+          tradeprice: Math.round(tradeprice * 1000) / 1000,
+          tradepriceuzs: Math.round(tradepriceuzs * 1) / 1,
+        });
+
+        const filialunitt = await Unit.findOne({
+          market: filialId,
+          name: unitt.name
+        })
+
+        if (!filialunitt) {
+          // return res.status(400).json({
+          //   message: `Diqqat! Ko'rsatilgan o'lchov birligi omborda mavjud emas.`,
+          // });
+          const newFilialUnit = new Unit({
+            name: unitt.name,
+            market: filialId
+          })
+          await newFilialUnit.save()
+
+          filialproduct.unit = newFilialUnit._id;
+        }
+
+        filialproduct.unit = filialunitt;
+        // product.total = total;
+
+
+        filialproductData.name = name;
+        filialproductData.code = code;
+        filialproductData.barcode = barcode;
+        if (filialCategory !== filialproductData.category) {
+          await Category.findByIdAndUpdate(filialproductData.category, {
+            $pull: {
+              products: new ObjectId(filialproductData._id),
+            },
+          });
+
+          updateCategory = await Category.findByIdAndUpdate(filialproductData.category, {
+            $push: {
+              products: filialproductData._id,
+            },
+          });
+          filialproduct.category = updateCategory._id;
+          productData.category = updateCategory._id;
+        }
+        filialproduct.minimumcount = minimumcount;
+        await filialproduct.save();
+        await filialproductData.save();
+      }
+    }
+
 
     const productcode = new RegExp(
       ".*" + search ? search.code : "" + ".*",
@@ -578,6 +793,7 @@ module.exports.update = async (req, res) => {
       count,
     });
   } catch (error) {
+    console.log(error);
     res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
@@ -620,28 +836,51 @@ module.exports.delete = async (req, res) => {
       });
     }
 
-    const product = await Product.findByIdAndDelete(_id);
+    const code = await ProductData.findById(productdata)
 
-    if (!product) {
-      return res.status(400).json({
-        message: `Diqqat! ${name} mahsuloti avval yaratilmagan.`,
-      });
+    if (!marke.mainmarket) {
+      for (const filialId of marke.filials) {
+        const filialproductdata = await ProductData.findOne({
+          market: filialId,
+          code: code.code,
+        })
+
+        const filialproduct = await Product.findOne({
+          market: filialId,
+          productdata: filialproductdata._id,
+        })
+
+        if (filialproduct.total > 0) {
+          return res.status(400).json({
+            message: "Diqqat! Boshqa omborlarda maxsulot mavjud!",
+          });
+        } else {
+          await Product.findByIdAndDelete(filialproduct._id);
+          await ProductData.findByIdAndDelete(filialproductdata._id);
+        }
+
+      }
+      const product = await Product.findByIdAndDelete(_id);
+
+      if (!product) {
+        return res.status(400).json({
+          message: `Diqqat! ${name} mahsuloti avval yaratilmagan.`,
+        });
+      }
+      
+      await ProductData.findByIdAndDelete(productdata);
+    } else {
+      const product = await Product.findById(_id);
+
+      if (!product) {
+        return res.status(400).json({
+          message: `Diqqat! ${name} mahsuloti avval yaratilmagan.`,
+        });
+      }
+  
+      await ProductData.findByIdAndDelete(productdata);
+      await Product.findByIdAndDelete(_id);
     }
-
-    await ProductData.findByIdAndDelete(productdata);
-
-    // const productData = await ProductData.findById(productdata);
-    // if (
-    //   productData.products.length === 0 &&
-    //   market === productData.market.toString()
-    // ) {
-    //   await ProductData.findByIdAndDelete(productdata._id);
-    //   await Category.findByIdAndUpdate(category, {
-    //     $pull: {
-    //       products: new ObjectId(productData._id),
-    //     },
-    //   });
-    // }
 
     const productcode = new RegExp(
       ".*" + search ? search.code : "" + ".*",
@@ -678,10 +917,12 @@ module.exports.delete = async (req, res) => {
 
     const count = filtered.length;
     filtered = filtered.splice(currentPage * countPage, countPage);
-    res.status(201).json({
-      products: filtered,
-      count,
-    });
+    
+      res.status(201).json({
+        products: filtered,
+        count,
+      });
+    
   } catch (error) {
     console.log(error);
     res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
@@ -1060,24 +1301,24 @@ module.exports.getAllCategory = async (req, res) => {
       )
       .lean()
 
-      for (const product of products) {
-          const saleproducts = await SaleProduct.find({
-            market,
-            product: product._id,
-            createdAt: {
-              $gte: startDate,
-              $lte: endDate
-            }
-          })
-          .select('pieces totalprice totalpriceuzs')
-          .lean()
-         
-          product.totalsaleproducts = saleproducts.reduce((prev, el) => prev + el.pieces, 0)
-          product.totalsales = saleproducts.reduce((prev, el) => prev + el.totalprice, 0)
-          product.totalsalesuzs = saleproducts.reduce((prev, el) => prev + el.totalpriceuzs, 0)
-      }
+    for (const product of products) {
+      const saleproducts = await SaleProduct.find({
+        market,
+        product: product._id,
+        createdAt: {
+          $gte: startDate,
+          $lte: endDate
+        }
+      })
+        .select('pieces totalprice totalpriceuzs')
+        .lean()
 
-      const response = [...products].sort((a, b) => a.totalsaleproducts > b.totalsaleproducts ? -1 : 1)
+      product.totalsaleproducts = saleproducts.reduce((prev, el) => prev + el.pieces, 0)
+      product.totalsales = saleproducts.reduce((prev, el) => prev + el.totalprice, 0)
+      product.totalsalesuzs = saleproducts.reduce((prev, el) => prev + el.totalpriceuzs, 0)
+    }
+
+    const response = [...products].sort((a, b) => a.totalsaleproducts > b.totalsaleproducts ? -1 : 1)
 
     res.status(201).send(response);
   } catch (error) {

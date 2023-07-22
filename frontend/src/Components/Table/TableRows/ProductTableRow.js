@@ -42,10 +42,10 @@ export const ProductTableRow = ({
                     <td className='td text-right'>
                         {product.price &&
                             (currency === 'UZS'
-                                ? product?.price?.incomingpriceuzs.toLocaleString(
+                                ? product?.price?.incomingpriceuzs && product?.price?.incomingpriceuzs.toLocaleString(
                                     'ru-RU'
                                 )
-                                : product?.price?.incomingprice.toLocaleString(
+                                : product?.price?.incomingprice && product?.price?.incomingprice.toLocaleString(
                                     'ru-RU'
                                 ))}{' '}
                         {currencyType}
@@ -53,10 +53,10 @@ export const ProductTableRow = ({
                     <td className='td text-right'>
                         {product.price &&
                             (currency === 'UZS'
-                                ? product?.price?.sellingpriceuzs.toLocaleString(
+                                ? product?.price?.sellingpriceuzs && product?.price?.sellingpriceuzs.toLocaleString(
                                     'ru-RU'
                                 )
-                                : product?.price?.sellingprice.toLocaleString(
+                                : product?.price?.sellingprice && product?.price?.sellingprice.toLocaleString(
                                     'ru-RU'
                                 ))}{' '}
                         {currencyType}
@@ -65,10 +65,10 @@ export const ProductTableRow = ({
                         {product.price?.tradepriceuzs ? (
                             <>
                                 {currency === 'UZS'
-                                    ? product?.price?.tradepriceuzs.toLocaleString(
+                                    ? product?.price?.tradepriceuzs && product?.price?.tradepriceuzs.toLocaleString(
                                         'ru-RU'
                                     )
-                                    : product?.price?.tradeprice.toLocaleString(
+                                    : product?.price?.tradeprice && product?.price?.tradeprice.toLocaleString(
                                         'ru-RU'
                                     )}{' '}
                                 {currencyType}
