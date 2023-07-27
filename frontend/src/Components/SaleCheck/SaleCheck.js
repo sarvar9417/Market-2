@@ -44,6 +44,9 @@ export const SaleCheck = forwardRef((props, ref) => {
                         </span>
                     </li>
                 </ul>
+                <div>
+                    <img className='w-[200px]' src={market?.image} alt="logo" />
+                </div>
                 <div className='check-ul-li flex-col'>
                     <div className={'grow text-center'}>
                         <h2 className='check-text-style mb-5'>

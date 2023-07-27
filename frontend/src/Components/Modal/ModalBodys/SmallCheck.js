@@ -57,11 +57,14 @@ export const SmallCheck = forwardRef((props, ref) => {
             }, 0)
             : 0
     }
-
+    console.log(market);
     return (
         <div ref={ref} className={'bg-white-900 p-4 rounded-md w-[7.5cm]'}>
             <div className='flex pb-2 flex-col text-center justify-center border-b-[0.8px] border-black-700'>
-                <h2 className='text-[16px] mb-4 font-bold'>{market.name}</h2>
+                <div>
+                    <img src={market?.image} alt="logo" />
+                </div>
+                {/* <h2 className='text-[16px] mb-4 font-bold'>{market.name}</h2> */}
                 <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
                     Telefon:
                     <span className='text-[12px] text-black-900 font-bold'>
@@ -193,11 +196,11 @@ export const SmallCheck = forwardRef((props, ref) => {
                 </div>
             )}
             <div className='text-black-900  check-ul-li-foot mt-4'>
-                    Jami :{' '}
-                    <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                        {calculateAllSum(selled).toLocaleString('ru-Ru')}{' '}
-                        {currencyType}
-                    </span>
+                Jami :{' '}
+                <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                    {calculateAllSum(selled).toLocaleString('ru-Ru')}{' '}
+                    {currencyType}
+                </span>
             </div>
             <div className='text-black-900 border-none check-ul-li-foot'>
                 {' '}
