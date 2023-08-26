@@ -11,6 +11,7 @@ export const TemporarySaleTableRow = ({ data, Delete, currency, Print }) => {
     const linkToSale = (temporary) => {
         navigate(link, { state: { temporary: { ...temporary } } })
     }
+
     return (
         <>
             {map(data, ({ _id, temporary, createdAt }, index) => (

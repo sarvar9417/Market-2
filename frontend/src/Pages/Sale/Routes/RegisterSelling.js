@@ -789,7 +789,7 @@ const RegisterSelling = () => {
             }
         })
     }
-
+    console.log(tableProducts);
     const handleClickSave = () => {
         if (tableProducts.length > 0) {
             const all = tableProducts.reduce(

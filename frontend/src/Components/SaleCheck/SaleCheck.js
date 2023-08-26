@@ -3,12 +3,13 @@ import { useSelector } from 'react-redux'
 import { uniqueId, map } from 'lodash'
 export const SaleCheck = forwardRef((props, ref) => {
     const { product } = props
+    const {products} = product
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateDebt = (total, payment, discount = 0) => {
         return (total - payment - discount).toLocaleString('ru-Ru')
     }
-
+    console.log(products);
     return (
         <div ref={ref} className={'bg-white-900 p-4 rounded-md'}>
             <div className='flex pb-2 justify-between border-b-[0.8px] border-black-700'>
@@ -84,15 +85,22 @@ export const SaleCheck = forwardRef((props, ref) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {map(product?.products, (item, index) => {
+                        {map([...products].sort(
+                                (a, b) =>
+                                    a.product?.category?.code.localeCompare(
+                                        b.product?.category?.code
+                                    ) ||
+                                    a.product?.productdata?.code -
+                                        b.product?.productdata?.code
+                            ), (item, index) => {
                             return (
                                 <tr key={uniqueId('saleCheck')}>
                                     <td className='p-1 border text-center text-[0.875rem] font-bold'>
                                         {index + 1}
                                     </td>
                                     <td className='check-table-body text-center'>
-                                        {item?.product?.productdata?.code}
-                                    </td>
+                                    {item?.product?.category?.code} {item?.product?.productdata?.code}
+                                    </td> 
                                     <td className='check-table-body text-start'>
                                         {item?.product?.productdata?.name}
                                     </td>

@@ -995,8 +995,17 @@ module.exports.registeredit = async (req, res) => {
         options: { sort: { created_at: -1 } },
         populate: {
           path: "product",
-          select: "poductdata total",
+          select: "poductdata total category",
           populate: { path: "productdata", select: "code name" },
+        },
+      })
+      .populate({
+        path: "products",
+        select: "totalprice unitprice totalpriceuzs unitpriceuzs pieces",
+        populate: {
+          path: "product",
+          select: "poductdata total category",
+          populate: { path: "category", select: "code name" },
         },
       })
       .populate("payment", "payment paymentuzs totalprice totalpriceuzs")

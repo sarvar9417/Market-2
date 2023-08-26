@@ -13,7 +13,7 @@ export const SaleCheckAll = forwardRef((props, ref) => {
         product,
         userInfo,
     } = props
-
+    console.log(selled);
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateAllSum = (data) => {
@@ -137,7 +137,7 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {map(selled, (item, index) => {
+                            {map([...selled].sort((a, b) => Number(a?.product?.category?.code) - Number(b?.product?.category?.code)), (item, index) => {
                                 return (
                                     <tr key={uniqueId('selled-row')}>
                                         <td className='p-1 border text-center text-[0.875rem] font-bold'>
@@ -149,7 +149,7 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                                             ).toLocaleDateString()}
                                         </td>
                                         <td className='check-table-body text-center'>
-                                            {item?.product?.productdata?.code}
+                                        {item?.product?.category?.code} {item?.product?.productdata?.code}
                                         </td>
                                         <td className='check-table-body text-start'>
                                             {item?.product?.productdata?.name}

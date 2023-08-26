@@ -41,7 +41,9 @@ const getProductsByCount = async ({ socket, market }) => {
           "sellingprice incomingprice sellingpriceuzs incomingpriceuzs tradeprice tradepriceuzs"
         )
         .populate("category", "name code")
-        .populate("unit", "name");
+        .populate("unit", "name")
+        .lean()
+        .then(products => products.sort((a, b) => Number(a.productdata.code) - Number(b.productdata.code)))
       socket.emit("getProductsOfCount", { id: market, products });
     }
   } catch (error) {
