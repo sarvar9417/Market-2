@@ -338,7 +338,7 @@ function Inventory() {
                 </div>
             </div>
             <SearchForm
-                filterBy={['total', 'category', 'code', 'name', 'confirmBtn']}
+                filterBy={['category', 'code', 'name', 'confirmBtn']}
                 searchByCategory={searchByCategory}
                 filterByCategory={filterByCategory}
                 filterByCode={filterByCode}

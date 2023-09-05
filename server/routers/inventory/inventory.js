@@ -14,7 +14,7 @@ const { ProductData } = require("../../models/Products/Productdata");
 //Product for Inventory
 module.exports.getProductsInventory = async (req, res) => {
   try {
-    const { market, currentPage, countPage, search } = req.body;
+    const { market, search } = req.body;
     const marke = await Market.findById(market);
     if (!marke) {
       return res
@@ -58,7 +58,7 @@ module.exports.getProductsInventory = async (req, res) => {
 
     const count = filter.length;
 
-    const sendingProducts = filter.splice(currentPage * countPage, countPage);
+    const sendingProducts = filter
 
     let inventoryConnector = await InventoryConnector.findOne({
       market,
@@ -248,7 +248,7 @@ module.exports.completed = async (req, res) => {
 //Product for Inventory
 module.exports.inventoryconnetors = async (req, res) => {
   try {
-    const { market, startDate, endDate, currentPage, countPage } = req.body;
+    const { market, startDate, endDate } = req.body;
     const marke = await Market.findById(market);
     if (!marke) {
       return res
@@ -273,8 +273,6 @@ module.exports.inventoryconnetors = async (req, res) => {
     })
       .select("inventories createdAt completed id")
       .sort({ _id: -1 })
-      .skip(currentPage * countPage)
-      .limit(countPage);
     res.status(201).json({ connectors: inventoryConnectors, count });
   } catch (error) {
     res.status(500).json({ message: "Serverda xatolik yuz berdi..." });
