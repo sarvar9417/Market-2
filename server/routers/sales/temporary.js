@@ -18,7 +18,7 @@ module.exports.register = async (req, res) => {
         message: `Diqqat! Do'kon haqida malumotlar topilmadi.`,
       });
     }
-
+    // console.log(market.brok);
     const newTemporary = new Temporary({
       temporary,
       market,
@@ -31,7 +31,7 @@ module.exports.register = async (req, res) => {
 
     res.status(201).send(temporaries);
   } catch (error) {
-    res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
+    res.status(400).json({ error: error.message, message: "Serverda xatolik yuz berdi..." });
   }
 };
 
@@ -78,7 +78,7 @@ module.exports.getAll = async (req, res) => {
     res.status(201).send(temporaries);
   } catch (error) {
     console.log(error);
-    res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
+    res.status(501).json({ error: error.message, message: "Serverda xatolik yuz berdi..." });
   }
 };
 
@@ -96,7 +96,7 @@ module.exports.getbById = async (req, res) => {
 
     res.status(201).send(temporary);
   } catch (error) {
-    res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
+    res.status(501).json({ error: error.message, message: "Serverda xatolik yuz berdi..." });
   }
 };
 
@@ -119,6 +119,6 @@ module.exports.deleteTemporary = async (req, res) => {
 
     res.status(201).send(temporaries);
   } catch (error) {
-    res.status(501).json({ error: "Serverda xatolik yuz berdi..." });
+    res.status(501).json({ error: error.message, message: "Serverda xatolik yuz berdi..." });
   }
 };
