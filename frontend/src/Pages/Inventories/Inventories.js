@@ -255,7 +255,7 @@ function Inventories() {
                 </div>
             </div>
             <SearchForm
-                filterBy={['startDate', 'endDate']}
+                filterBy={["total", 'startDate', 'endDate']}
                 filterByTotal={filterByTotal}
                 setEndDate={setEndDate}
                 setStartDate={setStartDate}
