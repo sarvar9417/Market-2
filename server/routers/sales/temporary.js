@@ -60,7 +60,7 @@ module.exports.getAll = async (req, res) => {
           const filialProductData = await ProductData.findOne({
             market: prod.filial,
             code: prod.product.code,
-            category: filialCategory?._id
+            category: filialCategory && filialCategory._id
           })
           if (filialProductData) {
             const product = await Product.findOne({
