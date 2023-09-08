@@ -1,28 +1,28 @@
-import React, {useCallback, useEffect, useState} from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import * as XLSX from 'xlsx'
 import Table from '../../Components/Table/Table'
 import Pagination from '../../Components/Pagination/Pagination'
 import SearchForm from '../../Components/SearchForm/SearchForm.js'
-import {useDispatch, useSelector} from 'react-redux'
-import {universalToast} from '../../Components/ToastMessages/ToastMessages.js'
+import { useDispatch, useSelector } from 'react-redux'
+import { universalToast } from '../../Components/ToastMessages/ToastMessages.js'
 import Spinner from '../../Components/Spinner/SmallLoader.js'
 import SmallLoader from '../../Components/Spinner/SmallLoader.js'
 import NotFind from '../../Components/NotFind/NotFind.js'
-import {motion} from 'framer-motion'
-import {getConnectors, postInventoriesId} from './inventorieSlice.js'
+import { motion } from 'framer-motion'
+import { getConnectors, postInventoriesId } from './inventorieSlice.js'
 import UniversalModal from '../../Components/Modal/UniversalModal'
-import {useTranslation} from 'react-i18next'
-import {universalSort} from './../../App/globalFunctions'
+import { useTranslation } from 'react-i18next'
+import { universalSort } from './../../App/globalFunctions'
 
 function Inventories() {
-    const {t} = useTranslation(['common'])
+    const { t } = useTranslation(['common'])
     const headers = [
-        {styles: 'w-[10%] text-start', title: '№'},
-        {styles: 'w-[10%] text-start', filter: 'createdAt', title: t('Sana')},
-        {styles: 'w-[10%] text-start', filter: 'id', title: t('ID')},
-        {styles: 'text-start', title: t('Maxsulotlar')},
-        {styles: 'w-[10%]', title: t('Holati')},
-        {styles: 'w-[10%]', title: ' '},
+        { styles: 'w-[10%] text-start', title: '№' },
+        { styles: 'w-[10%] text-start', filter: 'createdAt', title: t('Sana') },
+        { styles: 'w-[10%] text-start', filter: 'id', title: t('ID') },
+        { styles: 'text-start', title: t('Maxsulotlar') },
+        { styles: 'w-[10%]', title: t('Holati') },
+        { styles: 'w-[10%]', title: ' ' },
     ]
 
     const dispatch = useDispatch()
@@ -53,7 +53,7 @@ function Inventories() {
     const [modalVisible, setModalVisible] = useState(false)
 
     // filter by total
-    const filterByTotal = ({value}) => {
+    const filterByTotal = ({ value }) => {
         setShowByTotal(value)
         setCurrentPage(0)
     }
@@ -64,6 +64,7 @@ function Inventories() {
         t('Sana'),
         t('Kodi'),
         t('Maxsulot'),
+        t('Narxi UZS'),
         t('Dastlabki'),
         t('Sanoq'),
         t('Farqi'),
@@ -80,7 +81,7 @@ function Inventories() {
         const body = {
             id: e._id,
         }
-        dispatch(postInventoriesId(body)).then(({payload: {inventories}}) => {
+        dispatch(postInventoriesId(body)).then(({ payload: { inventories } }) => {
             if (inventories.length > 0) {
                 setPrintedInventories(inventories)
             }
@@ -89,6 +90,7 @@ function Inventories() {
     }
 
     const autoFillColumnWidth = (json) => {
+        console.log(json);
         const cols = Object.keys(json[0])
         const maxLength = cols.reduce((acc, curr) => {
             return acc > curr.length ? acc : curr.length
@@ -123,13 +125,14 @@ function Inventories() {
         const body = {
             id: e._id,
         }
-        dispatch(postInventoriesId(body)).then(({payload: {inventories}}) => {
+        dispatch(postInventoriesId(body)).then(({ payload: { inventories } }) => {
             if (inventories.length > 0) {
-                const newData = inventories.map((item, index) => ({
+                const newData = [...inventories].map((item, index) => ({
                     nth: index + 1,
                     data: new Date(item?.createdAt).toLocaleDateString(),
                     code: item.productdata.code,
                     name: item.productdata.name,
+                    incomingprice: item.price.incomingpriceuzs,
                     initial: item.productcount,
                     count: item.inventorycount,
                     difference: item.inventorycount - item.productcount,
@@ -140,6 +143,24 @@ function Inventories() {
                         item.inventorycount * item.price.incomingpriceuzs -
                         item.productcount * item.price.incomingpriceuzs,
                 }))
+                newData.push(
+                    {
+                    nth: "",
+                    data: "",
+                    code: "",
+                    name: "",
+                    incomingprice: [...inventories].reduce(((prev, el) => prev + el.price.incomingpriceuzs), 0),
+                    initial: [...inventories].reduce(((prev, el) => prev + el.productcount), 0),
+                    count: [...inventories].reduce(((prev, el) => prev + el.inventorycount), 0),
+                    difference: [...inventories].reduce(((prev, el) => prev + (el.inventorycount - el.productcount)), 0),
+                    differenceUSD: 
+                    [...inventories].reduce(((prev, el) => prev + (el.inventorycount * el.price.incomingprice -
+                        el.productcount * el.price.incomingprice)), 0),
+                    differenceUZS:
+                    [...inventories].reduce(((prev, el) => prev + (el.inventorycount * el.price.incomingpriceuzs -
+                        el.productcount * el.price.incomingpriceuzs)), 0),
+                    }
+                )
                 continueHandleClick(newData, idx)
             }
         })
@@ -221,10 +242,10 @@ function Inventories() {
             animate='open'
             exit='collapsed'
             variants={{
-                open: {opacity: 1, height: 'auto'},
-                collapsed: {opacity: 0, height: 0},
+                open: { opacity: 1, height: 'auto' },
+                collapsed: { opacity: 0, height: 0 },
             }}
-            transition={{duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98]}}
+            transition={{ duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98] }}
         >
             <UniversalModal
                 printedInventories={printedInventories}
