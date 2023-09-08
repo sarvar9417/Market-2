@@ -12,7 +12,7 @@ import { motion } from 'framer-motion'
 import { getConnectors, postInventoriesId } from './inventorieSlice.js'
 import UniversalModal from '../../Components/Modal/UniversalModal'
 import { useTranslation } from 'react-i18next'
-import { universalSort } from './../../App/globalFunctions'
+import { roundUzs, universalSort } from './../../App/globalFunctions'
 
 function Inventories() {
     const { t } = useTranslation(['common'])
@@ -68,7 +68,6 @@ function Inventories() {
         t('Dastlabki'),
         t('Sanoq'),
         t('Farqi'),
-        t('Farqi USD'),
         t('Farqi UZS'),
     ]
 
@@ -132,13 +131,10 @@ function Inventories() {
                     data: new Date(item?.createdAt).toLocaleDateString(),
                     code: item.productdata.code,
                     name: item.productdata.name,
-                    incomingprice: item.price.incomingpriceuzs,
+                    incomingprice: roundUzs(item.price.incomingpriceuzs * item.productcount),
                     initial: item.productcount,
                     count: item.inventorycount,
                     difference: item.inventorycount - item.productcount,
-                    differenceUSD:
-                        item.inventorycount * item.price.incomingprice -
-                        item.productcount * item.price.incomingprice,
                     differenceUZS:
                         item.inventorycount * item.price.incomingpriceuzs -
                         item.productcount * item.price.incomingpriceuzs,
@@ -149,13 +145,10 @@ function Inventories() {
                     data: "",
                     code: "",
                     name: "",
-                    incomingprice: [...inventories].reduce(((prev, el) => prev + el.price.incomingpriceuzs), 0),
+                    incomingprice: [...inventories].reduce(((prev, el) => prev + roundUzs(el.price.incomingpriceuzs * el.productcount)), 0),
                     initial: [...inventories].reduce(((prev, el) => prev + el.productcount), 0),
                     count: [...inventories].reduce(((prev, el) => prev + el.inventorycount), 0),
                     difference: [...inventories].reduce(((prev, el) => prev + (el.inventorycount - el.productcount)), 0),
-                    differenceUSD: 
-                    [...inventories].reduce(((prev, el) => prev + (el.inventorycount * el.price.incomingprice -
-                        el.productcount * el.price.incomingprice)), 0),
                     differenceUZS:
                     [...inventories].reduce(((prev, el) => prev + (el.inventorycount * el.price.incomingpriceuzs -
                         el.productcount * el.price.incomingpriceuzs)), 0),
