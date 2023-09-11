@@ -56,6 +56,7 @@ const AdminProduct = () => {
         {title: "Do'kon nomi", styles: 'text-center'},
         {title: 'Director', styles: 'text-center'},
         {title: 'Telefon', styles: 'w-[7.875rem]'},
+        {title: "Sa'nasi", styles: ''},
         {title: 'Turi', styles: 'text-center w-[3.1875rem]'},
         {title: '', styles: 'w-[3rem]'},
         {title: 'Delete', styles: 'w-[3rem]'},

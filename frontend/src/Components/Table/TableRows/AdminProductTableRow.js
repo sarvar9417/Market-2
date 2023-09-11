@@ -43,6 +43,7 @@ export const AdminProductTableRow = ({
                         {market?.director?.lastname}
                     </td>
                     <td className='td text-right'>{market?.phone1}</td>
+                    <td className='td text-right'>{new Date(market?.createdAt).toLocaleDateString()}</td>
                     <td className='td text-center'>
                         {market?.mainmarket ? (
                             <div className='w-[24px] h-[24px] mx-auto bg-[#F79009] rounded-[50%]'></div>
