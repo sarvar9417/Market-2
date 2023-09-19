@@ -693,7 +693,7 @@ module.exports.getsaleconnectors = async (req, res) => {
       )
       .populate(
         "discounts",
-        "discount discountuzs procient products totalprice totalpriceuzs"
+        "discount discountuzs createdAt procient products totalprice totalpriceuzs"
       )
       .populate({ path: "client", match: { name: name }, select: "name" })
       .populate("packman", "name")
@@ -724,10 +724,16 @@ module.exports.getsaleconnectors = async (req, res) => {
           new Date(payment.createdAt) < new Date(endDate)
         );
       });
+      const filterDiscount = connector.discounts.filter((discount) => {
+        return (
+          new Date(discount.createdAt) > new Date(startDate) &&
+          new Date(discount.createdAt) < new Date(endDate)
+        );
+      });
       return {
         _id: connector._id,
         dailyconnectors: connector.dailyconnectors,
-        discounts: connector.discounts,
+        discounts: filterDiscount,
         debts: connector.debts,
         user: connector.user,
         createdAt: connector.createdAt,
