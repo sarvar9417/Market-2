@@ -549,7 +549,7 @@ module.exports.update = async (req, res) => {
 
     const { currentPage, countPage, search } = req.body;
     const marke = await Market.findById(market);
-    console.log(marke);
+    
     if (!marke) {
       return res.status(400).json({
         message: "Diqqat! Do'kon ma'lumotlari topilmadi.",
@@ -656,7 +656,7 @@ module.exports.update = async (req, res) => {
 
     if (!marke.mainmarket) {
       for (const filialId of marke.filials) {
-
+        console.log(filialId);
         const filialCategory = await Category.findOne({
           market: filialId,
           code: categoryData.code
@@ -668,8 +668,10 @@ module.exports.update = async (req, res) => {
           category: filialCategory
         });
 
+        console.log(filialproductData);
+
         const filialproduct = await Product.findOne({
-          productdata: filialproductData._id,
+          productdata: filialproductData && filialproductData._id,
           market: filialId
         })
           .populate({
@@ -681,68 +683,70 @@ module.exports.update = async (req, res) => {
             select: "code",
           });
 
-        await ProductPrice.findByIdAndUpdate(filialproduct.price, {
-          incomingprice: Math.round(incomingprice * 1000) / 1000,
-          sellingprice: Math.round(sellingprice * 1000) / 1000,
-          incomingpriceuzs:
-            Math.round(
-              (incomingpriceuzs
-                ? incomingpriceuzs
-                : exchangerate.exchangerate * incomingprice) * 1
-            ) / 1,
-          sellingpriceuzs:
-            Math.round(
-              (sellingpriceuzs
-                ? sellingpriceuzs
-                : exchangerate.exchangerate * sellingprice) * 1
-            ) / 1,
-          tradeprice: Math.round(tradeprice * 1000) / 1000,
-          tradepriceuzs: Math.round(tradepriceuzs * 1) / 1,
-        });
-
-        const filialunitt = await Unit.findOne({
-          market: filialId,
-          name: unitt.name
-        })
-
-        if (!filialunitt) {
-          // return res.status(400).json({
-          //   message: `Diqqat! Ko'rsatilgan o'lchov birligi omborda mavjud emas.`,
-          // });
-          const newFilialUnit = new Unit({
-            name: unitt.name,
-            market: filialId
+        if (filialCategory && filialproductData && filialproduct) {
+          await ProductPrice.findByIdAndUpdate(filialproduct.price, {
+            incomingprice: Math.round(incomingprice * 1000) / 1000,
+            sellingprice: Math.round(sellingprice * 1000) / 1000,
+            incomingpriceuzs:
+              Math.round(
+                (incomingpriceuzs
+                  ? incomingpriceuzs
+                  : exchangerate.exchangerate * incomingprice) * 1
+              ) / 1,
+            sellingpriceuzs:
+              Math.round(
+                (sellingpriceuzs
+                  ? sellingpriceuzs
+                  : exchangerate.exchangerate * sellingprice) * 1
+              ) / 1,
+            tradeprice: Math.round(tradeprice * 1000) / 1000,
+            tradepriceuzs: Math.round(tradepriceuzs * 1) / 1,
+          });
+  
+          const filialunitt = await Unit.findOne({
+            market: filialId,
+            name: unitt.name
           })
-          await newFilialUnit.save()
-
-          filialproduct.unit = newFilialUnit._id;
+  
+          if (!filialunitt) {
+            // return res.status(400).json({
+            //   message: `Diqqat! Ko'rsatilgan o'lchov birligi omborda mavjud emas.`,
+            // });
+            const newFilialUnit = new Unit({
+              name: unitt.name,
+              market: filialId
+            })
+            await newFilialUnit.save()
+  
+            filialproduct.unit = newFilialUnit._id;
+          }
+  
+          filialproduct.unit = filialunitt;
+          // product.total = total;
+  
+  
+          filialproductData.name = name;
+          filialproductData.code = code;
+          filialproductData.barcode = barcode;
+          if (filialCategory !== filialproductData.category) {
+            await Category.findByIdAndUpdate(filialproductData.category, {
+              $pull: {
+                products: new ObjectId(filialproductData._id),
+              },
+            });
+  
+            updateCategory = await Category.findByIdAndUpdate(filialproductData.category, {
+              $push: {
+                products: filialproductData._id,
+              },
+            });
+            filialproduct.category = updateCategory._id;
+            productData.category = updateCategory._id;
+          }
+          filialproduct.minimumcount = minimumcount;
+          await filialproduct.save();
+          await filialproductData.save();
         }
-
-        filialproduct.unit = filialunitt;
-        // product.total = total;
-
-
-        filialproductData.name = name;
-        filialproductData.code = code;
-        filialproductData.barcode = barcode;
-        if (filialCategory !== filialproductData.category) {
-          await Category.findByIdAndUpdate(filialproductData.category, {
-            $pull: {
-              products: new ObjectId(filialproductData._id),
-            },
-          });
-
-          updateCategory = await Category.findByIdAndUpdate(filialproductData.category, {
-            $push: {
-              products: filialproductData._id,
-            },
-          });
-          filialproduct.category = updateCategory._id;
-          productData.category = updateCategory._id;
-        }
-        filialproduct.minimumcount = minimumcount;
-        await filialproduct.save();
-        await filialproductData.save();
       }
     }
 
