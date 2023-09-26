@@ -16,6 +16,8 @@ function validateExchangerate(exchangerate) {
   const schema = Joi.object({
     exchangerate: Joi.number().required(),
     market: Joi.string().required(),
+    isIncomingPrice: Joi.boolean().optional(),
+    isSellingPrice: Joi.boolean().optional(),
   })
 
   return schema.validate(exchangerate)
