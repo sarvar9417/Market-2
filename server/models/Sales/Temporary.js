@@ -4,6 +4,7 @@ const Joi = require('joi');
 const temporary = new Schema(
   {
     temporary: { type: Object },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     market: { type: Schema.Types.ObjectId, ref: 'Market', required: true },
     isArchive: { type: Boolean, default: false },
   },

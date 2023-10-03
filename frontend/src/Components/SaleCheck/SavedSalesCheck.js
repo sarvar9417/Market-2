@@ -11,7 +11,7 @@ export const SavedSalesCheck = forwardRef((props, ref) => {
     const {currencyType} = useSelector((state) => state.currency)
     const [loadContent, setLoadContent] = useState(false)
     const saleCheckRef = useRef(null)
-
+console.log(product);
     const onBeforeGetContentResolve = useRef(null)
     const handleOnBeforeGetContent = React.useCallback(() => {
         setLoadContent(true)
@@ -120,7 +120,7 @@ export const SavedSalesCheck = forwardRef((props, ref) => {
                             <p>
                                 Sotuvchi:{' '}
                                 <span className='check-ul-li-span'>
-                                    {user?.firstname} {user?.lastname}
+                                    {product?.user?.firstname} {product?.user?.lastname}
                                 </span>
                             </p>
                         </div>

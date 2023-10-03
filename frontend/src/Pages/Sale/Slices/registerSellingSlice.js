@@ -45,6 +45,7 @@ export const savePayment = createAsyncThunk(
     'registerSelling/saveTemporary',
     async (body = {}, {rejectWithValue}) => {
         try {
+            console.log(body);
             const {data} = await Api.post('/sales/temporary/register', body)
             return data
         } catch (error) {

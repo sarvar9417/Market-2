@@ -16,11 +16,11 @@ export const RegisterSaleTableRow = (
         increment,
         decrement,
         lowUnitpriceProducts,
-        wholeSale,
+        wholeSale
     }) => {
 
     const { filials } = useSelector((state) => state.registerSelling)
-
+    // console.log(filials);
     const { market } = useSelector((state) => state.login)
     const [showIncomingPrice, setShowIncomingPrice] = useState([])
     const changeShow = (i) => {
@@ -38,7 +38,7 @@ export const RegisterSaleTableRow = (
                 <tr className={`tr ${filter(lowUnitpriceProducts, id => id === product.product._id).length > 0 ? 'bg-warning-200' : ''}`}
                     key={'salerow-' + index + 1}>
                     <td className='text-left td'>{index + 1}</td>
-                    <td className='td w-[100px]'>
+                    {filials.length > 1 && <td className='td w-[100px]'>
                         <select onChange={(e) => changeHandler(
                             product.product._id,
                             {
@@ -52,7 +52,7 @@ export const RegisterSaleTableRow = (
                                 <option key={ind} value={filial.value}>{filial.label}</option>
                             )}
                         </select>
-                    </td>
+                    </td>}
                     <td className='text-right td font-bold'><span style={{ color: product?.filialProductsTotal > 0 ? "green" : 'red' }} >{product?.filialProductsTotal}</span></td>
                     <td className='text-left td'>{product.product.name}</td>
                     <td className='text-right td'>
@@ -78,7 +78,7 @@ export const RegisterSaleTableRow = (
                                     size={'0.875rem'} /></button>
                         </span>
                     </td>
-                    <td className='text-right td'>
+                    {filials.length > 1 && <td className='text-right td'>
                         <TableInput
                             value={product.fromFilial}
                             onChange={(e) =>
@@ -91,7 +91,7 @@ export const RegisterSaleTableRow = (
                             type={'number'}
                             disabled={product.filial === market._id && true}
                         />
-                    </td>
+                    </td>}
                     <td className='text-right td'>
                         <TableInput
                             value={

@@ -49,6 +49,7 @@ const RegisterSelling = () => {
     const {user, market} = useSelector((state) => state.login)
     const {currencyType, currency} = useSelector((state) => state.currency)
     const {allcategories, loading} = useSelector((state) => state.category)
+    const { filials } = useSelector((state) => state.registerSelling)
     const {allProducts, clients, loadingMakePayment, lastPayments} =
         useSelector((state) => state.registerSelling)
     const {packmans} = useSelector((state) => state.clients)
@@ -118,6 +119,18 @@ const RegisterSelling = () => {
         {title: t('Nomi')},
         {title: t('Soni')},
         {title: 'Ombordan'},
+        {title: t('Narxi')},
+        {title: t('Jami'), styles: 'w-[8rem]'},
+        {title: ''},
+        {title: ''},
+    ]
+    const headers2 = [
+        {title: '№'},
+        // {title: t('Filial')},
+        {title: t('Qoldiq')},
+        {title: t('Nomi')},
+        {title: t('Soni')},
+        // {title: 'Ombordan'},
         {title: t('Narxi')},
         {title: t('Jami'), styles: 'w-[8rem]'},
         {title: ''},
@@ -789,7 +802,7 @@ const RegisterSelling = () => {
             }
         })
     }
-    console.log(tableProducts);
+    // console.log(tableProducts);
     const handleClickSave = () => {
         if (tableProducts.length > 0) {
             const all = tableProducts.reduce(
@@ -810,6 +823,7 @@ const RegisterSelling = () => {
                     totalPrice: all,
                     totalPriceUzs: allUzs,
                 },
+                user: user._id,
             }
             dispatch(savePayment(body)).then(({error}) => {
                 if (!error) {
@@ -1140,6 +1154,8 @@ const RegisterSelling = () => {
         )
         setTableProducts(newRelease)
     }
+
+    // console.log(market);
 
     const handleChangeProduct = (value, key) => {
         switch (key) {
@@ -1765,7 +1781,7 @@ const RegisterSelling = () => {
                         <Table
                             page={'registersale'}
                             data={tableProducts}
-                            headers={headers}
+                            headers={filials.length > 1 ? headers : headers2}
                             currency={currencyType}
                             Delete={handleDelete}
                             changeHandler={handleChange}

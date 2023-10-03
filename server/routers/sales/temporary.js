@@ -8,10 +8,11 @@ const { ProductData } = require("../../models/Products/Productdata");
 const {
   Product
 } = require("../../models/Products/Product");
+require("../../models/Users");
 
 module.exports.register = async (req, res) => {
   try {
-    const { temporary, market } = req.body;
+    const { temporary, market, user } = req.body;
     const marke = await Market.findById(market);
     if (!marke) {
       return res.status(400).json({
@@ -22,12 +23,14 @@ module.exports.register = async (req, res) => {
     const newTemporary = new Temporary({
       temporary,
       market,
+      user
     });
     await newTemporary.save();
 
     const temporaries = await Temporary.find({ market }).select(
-      "temporary createdAt"
-    );
+      "temporary createdAt user"
+    )
+    .populate('user', 'firstname lastname')
 
     res.status(201).send(temporaries);
   } catch (error) {
@@ -46,8 +49,9 @@ module.exports.getAll = async (req, res) => {
     }
 
     const temporaries = await Temporary.find({ market }).select(
-      "temporary createdAt"
+      "temporary createdAt user"
     )
+    .populate('user', 'firstname lastname')
       .lean()
 
     for (const temp of temporaries) {
@@ -92,7 +96,7 @@ module.exports.getbById = async (req, res) => {
       });
     }
 
-    const temporary = await Temporary.findById(temporaryId).select("temporary");
+    const temporary = await Temporary.findById(temporaryId).select("temporary user");
 
     res.status(201).send(temporary);
   } catch (error) {

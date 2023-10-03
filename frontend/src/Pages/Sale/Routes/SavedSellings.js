@@ -32,6 +32,7 @@ const SavedSellings = () => {
     const [selectedPayment, setSelectedPayment] = useState(null)
     const headers = [
         { styles: 'w-[10%] text-start', filter: '', title: '№' },
+        { styles: 'w-[40%]', title: t('Sotuvchi') },
         { styles: 'w-[40%]', filter: 'temporary.clientValue', title: t('Mijoz') },
         { styles: 'w-[10%]', filter: '', title: t('Maxsulotlar') },
         { styles: 'w-[10%] text-center', filter: 'temporary.totalPrice', title: t('Jami') },
@@ -68,6 +69,7 @@ const SavedSellings = () => {
             products: el.temporary.tableProducts,
             client: { name: el.temporary.clientValue?.label },
             packman: { name: el.temporary.packmanValue.label },
+            user: el.user,
         })
     }
 
