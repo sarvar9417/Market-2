@@ -97,6 +97,12 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                                 ''}
                         </span>
                     </li>
+                    <li className='check-ul-li font-bold'>
+                        Izoh:{' '}
+                        <span className='check-ul-li-span font-bold'>
+                            {product?.dailyconnectors[product?.dailyconnectors.length - 1] && product?.dailyconnectors[product?.dailyconnectors.length - 1].comment}
+                        </span>
+                    </li>
                 </ul>
                 <div>
                     <img className='w-[200px]' src={market?.image} alt="logo" />
